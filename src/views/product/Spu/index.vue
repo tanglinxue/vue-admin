@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card style="margin:20px 0px">
-      <CategorySelect :show="!show" @getCategoryId="getCategoryId" />
+      <CategorySelect :show="scene!==0" @getCategoryId="getCategoryId" />
     </el-card>
     <el-card>
       <div v-show="scene===0">
@@ -23,6 +23,7 @@
                 icon="el-icon-plus"
                 size="mini"
                 title="添加sku"
+                @click="addSku(row)"
               />
               <hint-button
                 type="warning"
@@ -37,12 +38,18 @@
                 size="mini"
                 title="查看当前spu全部sku列表"
               />
-              <hint-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                title="删除spu"
-              />
+              <el-popconfirm
+                :title="`确定删除${row.spuName}?`"
+                @onConfirm="deleteSpu(row)"
+              >
+                <hint-button
+                  slot="reference"
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  title="删除spu"
+                />
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -59,7 +66,7 @@
         />
       </div>
       <SpuForm v-show="scene==1" ref="spu" @changeScene="changeScene" />
-      <SkuForm v-show="scene==2" />
+      <SkuForm v-show="scene==2" ref="sku" />
     </el-card>
   </div>
 </template>
@@ -78,7 +85,6 @@ export default {
       category1Id: '',
       category2Id: '',
       category3Id: '',
-      show: true,
       // 代表的分页器第几页
       page: 1,
       // 当前页数展示数据条数
@@ -120,14 +126,33 @@ export default {
     },
     addSpu() {
       this.scene = 1
+      this.$refs.spu.addSpuData(this.category3Id)
     },
     updateSpu(row) {
       this.scene = 1
-      console.log(this.$refs.spu.initSpuData)
       this.$refs.spu.initSpuData(row)
     },
-    changeScene(scene) {
+    changeScene({ scene, flag }) {
       this.scene = scene
+      if (flag === '修改') {
+        this.getSpuList(this.page)
+      } else {
+        this.getSpuList()
+      }
+    },
+    async deleteSpu(row) {
+      const result = await this.$API.spu.reqDeleteSpu(row.id)
+      console.log(result)
+      if (result.code === 200) {
+        this.$message({ type: 'success', message: '删除成功' })
+        this.getSpuList(this.records.length > 1 ? this.page : this.page - 1)
+      }
+    },
+    // 添加SKU按钮的回调
+    addSku(row) {
+      // 切换场景为2
+      this.scene = 2
+      this.$refs.sku.getData(this.category1Id, this.category2Id, row.id)
     }
   }
 }
