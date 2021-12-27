@@ -37,6 +37,7 @@
                 icon="el-icon-info"
                 size="mini"
                 title="查看当前spu全部sku列表"
+                @click="handler(row)"
               />
               <el-popconfirm
                 :title="`确定删除${row.spuName}?`"
@@ -66,8 +67,20 @@
         />
       </div>
       <SpuForm v-show="scene==1" ref="spu" @changeScene="changeScene" />
-      <SkuForm v-show="scene==2" ref="sku" />
+      <SkuForm v-show="scene==2" ref="sku" @changeScene="changeScene" />
     </el-card>
+    <el-dialog :title="`${spu.spuName}的sku列表`" :visible.sync="dialogTableVisible" :before-close="close">
+      <el-table v-loading="loading" :data="skuList">
+        <el-table-column property="skuName" label="名称" />
+        <el-table-column property="price" label="价格" />
+        <el-table-column property="weight" label="重量" />
+        <el-table-column property="name" label="默认图片">
+          <template slot-scope="{ row }">
+            <img :src="row.skuDefaultImg" alt="" style="width:100px;height:100px;">
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -92,6 +105,10 @@ export default {
       // 总共数据条数
       total: 0,
       records: [],
+      dialogTableVisible: false,
+      spu: {},
+      skuList: [],
+      loading: true,
       scene: 0 // 0代表展示SPU列表数据   1 添加SPU|修改SPU   2 添加SKU
     }
   },
@@ -136,7 +153,7 @@ export default {
       this.scene = scene
       if (flag === '修改') {
         this.getSpuList(this.page)
-      } else {
+      } else if (flag === '添加') {
         this.getSpuList()
       }
     },
@@ -152,7 +169,28 @@ export default {
     addSku(row) {
       // 切换场景为2
       this.scene = 2
-      this.$refs.sku.getData(this.category1Id, this.category2Id, row.id)
+      this.$refs.sku.getData(this.category1Id, this.category2Id, row)
+    },
+    // 查看当前spu全部sku列表
+    async handler(spu) {
+      console.log(spu)
+      this.dialogTableVisible = true
+      this.spu = spu
+      // 获取sku列表的数据进行展示
+      const result = await this.$API.spu.reqSkuList(spu.id)
+      if (result.code === 200) {
+        this.skuList = result.data
+        this.loading = false
+      }
+    },
+    // 关闭对话框的回调
+    close(done) {
+      // loading属性再次变为真
+      this.loading = true
+      // 清除sku列表的数据
+      this.skuList = []
+      // 管理对话框
+      done()
     }
   }
 }
