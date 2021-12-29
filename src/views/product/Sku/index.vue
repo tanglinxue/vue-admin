@@ -12,7 +12,7 @@
       <el-table-column label="重量" width="80px" prop="weight" />
       <el-table-column label="价格" width="80px" prop="price" />
       <el-table-column prop="prop" label="操作">
-        <template slot-scope="{row, $index }">
+        <template slot-scope="{row }">
           <el-button
             v-if="row.isSale==0"
             type="success"
