@@ -32,7 +32,6 @@ export default {
           // 图标形式-柱状图
           type: 'bar',
           data: [78],
-          color: 'cyan',
           // 柱状图的宽度
           barWidth: 10,
           color: 'yellowgreen',
