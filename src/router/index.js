@@ -1,10 +1,16 @@
+// 引入Vue|Vue-router
 import Vue from 'vue'
 import Router from 'vue-router'
 
+// 使用路由插件
 Vue.use(Router)
 
+/* 引入最外层骨架的一级路由组件*/
 import Layout from '@/layout'
 
+// 路由的配置：为什么不同用户登录我们的项目，菜单（路由）都是一样的？
+// 因为咱们的路由‘死的’，不管你是谁，你能看见的，操作的菜单都是一样的
+// 需要把项目中的路由进行拆分
 export const constantRoutes = [
   {
     path: '/login',
