@@ -31,7 +31,9 @@ export default {
       'sidebar'
     ]),
     routes() {
-      return this.$router.options.routes
+      // 需要遍历的应该是仓库计算完毕的全部路由
+      console.log(this.$store.state.user.resultAllResults)
+      return this.$store.state.user.resultAllResults
     },
     activeMenu() {
       const route = this.$route

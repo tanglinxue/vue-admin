@@ -11,6 +11,9 @@ import Layout from '@/layout'
 // 路由的配置：为什么不同用户登录我们的项目，菜单（路由）都是一样的？
 // 因为咱们的路由‘死的’，不管你是谁，你能看见的，操作的菜单都是一样的
 // 需要把项目中的路由进行拆分
+
+// 常量路由：就是不管用户什么角色都可以看到
+// 登录，404，首页
 export const constantRoutes = [
   {
     path: '/login',
@@ -34,38 +37,12 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
-  },
+  }
 
-  {
-    path: '/product',
-    component: Layout,
-    redirect: '/Product',
-    meta: { title: '商品管理', icon: 'el-icon-goods' },
-    children: [{
-      path: 'tradeMark',
-      name: 'TradeMark',
-      component: () => import('@/views/product/tradeMark'),
-      meta: { title: '品牌管理' }
-    },
-    {
-      path: 'attr',
-      name: 'Attr',
-      component: () => import('@/views/product/Attr'),
-      meta: { title: '平台属性管理' }
-    },
-    {
-      path: 'spu',
-      name: 'Spu',
-      component: () => import('@/views/product/Spu'),
-      meta: { title: 'Spu管理' }
-    },
-    {
-      path: 'sku',
-      name: 'Sku',
-      component: () => import('@/views/product/Sku'),
-      meta: { title: 'Sku管理' }
-    }]
-  },
+]
+
+// 异步路由:不同的用户，需要过滤筛选出的路由
+export const asyncRoutes = [
   {
     name: 'Acl',
     path: '/acl',
@@ -112,12 +89,46 @@ export const constantRoutes = [
       }
     ]
   },
-  { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '/product',
+    component: Layout,
+    name: 'Product',
+    redirect: '/Product',
+    meta: { title: '商品管理', icon: 'el-icon-goods' },
+    children: [{
+      path: 'tradeMark',
+      name: 'TradeMark',
+      component: () => import('@/views/product/tradeMark'),
+      meta: { title: '品牌管理' }
+    },
+    {
+      path: 'attr',
+      name: 'Attr',
+      component: () => import('@/views/product/Attr'),
+      meta: { title: '平台属性管理' }
+    },
+    {
+      path: 'spu',
+      name: 'Spu',
+      component: () => import('@/views/product/Spu'),
+      meta: { title: 'Spu管理' }
+    },
+    {
+      path: 'sku',
+      name: 'Sku',
+      component: () => import('@/views/product/Sku'),
+      meta: { title: 'Sku管理' }
+    }]
+  }
 ]
+
+// 任意路由:当路径错误的时候重定向404
+export const anyRoutes = [{ path: '*', redirect: '/404', hidden: true }]
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
+  // 因为注册的路由是死得，活的路由如果根据不同用户可以展示不同菜单
   routes: constantRoutes
 })
 
